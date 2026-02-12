@@ -1,0 +1,1868 @@
+{
+  "info": {
+    "name": "Pomelo Webhook Simulator",
+    "_postman_id": "pomelo-webhook-simulator-v1",
+    "description": "Collection completa para testar todos os cenários do webhook Pomelo (débito).\n\n## Como usar\n1. Inicie o servidor: `go run ./cmd/server`\n2. Selecione o environment **Pomelo Local**\n3. Execute as pastas em ordem ou rode cada cenário individualmente\n\n## Variáveis de ambiente\n- `base_url`: URL do servidor (default: http://localhost:8080)\n- `tx_id`, `adj_id`: IDs de transação gerados automaticamente pelos pre-request scripts",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🟢 Health Check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Body has status ok', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('ok');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🛒 01 · PURCHASE — Aprovada",
+      "item": [
+        {
+          "name": "POST PURCHASE APPROVED",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_purchase_approved', 'tx-approved-' + Date.now());",
+                  "pm.collectionVariables.set('idem_purchase_approved', 'idem-approved-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('transaction_id presente', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.transaction_id).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.test('idempotent = false', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_purchase_approved}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": {\n    \"id\": \"MERCH-001\",\n    \"mcc\": \"5411\",\n    \"address\": \"Av. Paulista, 1000\",\n    \"name\": \"Supermercado Central\",\n    \"city\": \"São Paulo\",\n    \"state\": \"SP\"\n  },\n  \"event\": {\n    \"id\": \"evt-{{tx_purchase_approved}}\",\n    \"created_at\": \"2024-06-01T10:00:00Z\",\n    \"idempotency_key\": \"{{idem_purchase_approved}}\"\n  },\n  \"user_id\": \"user-001\",\n  \"card_id\": \"card-001\",\n  \"country\": \"BR\",\n  \"currency\": \"BRL\",\n  \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /transactions/:id (verificar gravação)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Type = PURCHASE', () => {",
+                  "    pm.expect(pm.response.json().Type).to.eql('PURCHASE');",
+                  "});",
+                  "pm.test('Status = APPROVED', () => {",
+                  "    pm.expect(pm.response.json().Status).to.eql('APPROVED');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/transactions/{{tx_purchase_approved}}",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "{{tx_purchase_approved}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "❌ 02 · PURCHASE — Rejeitada",
+      "item": [
+        {
+          "name": "POST PURCHASE REJECTED",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_purchase_rejected', 'tx-rejected-' + Date.now());",
+                  "pm.collectionVariables.set('idem_purchase_rejected', 'idem-rejected-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('idempotent = false', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_purchase_rejected}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"REJECTED\",\n  \"amount\": {\n    \"local\":       { \"total\": 5000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 5000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 5000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 5000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": {\n    \"id\": \"MERCH-001\",\n    \"mcc\": \"5411\",\n    \"name\": \"Supermercado Central\",\n    \"city\": \"São Paulo\",\n    \"state\": \"SP\"\n  },\n  \"event\": {\n    \"id\": \"evt-{{tx_purchase_rejected}}\",\n    \"created_at\": \"2024-06-01T10:05:00Z\",\n    \"idempotency_key\": \"{{idem_purchase_rejected}}\"\n  },\n  \"user_id\": \"user-001\",\n  \"card_id\": \"card-001\",\n  \"country\": \"BR\",\n  \"currency\": \"BRL\",\n  \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔄 03 · REVERSAL — Total",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (base)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rt_purchase', 'tx-rt-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rt_purchase', 'idem-rt-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rt_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-001\", \"mcc\": \"5411\", \"name\": \"Loja ABC\", \"city\": \"RJ\", \"state\": \"RJ\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rt_purchase}}\",\n    \"created_at\": \"2024-06-01T11:00:00Z\",\n    \"idempotency_key\": \"{{idem_rt_purchase}}\"\n  },\n  \"user_id\": \"user-001\", \"card_id\": \"card-001\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REVERSAL_PURCHASE (valor total) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rt_reversal', 'tx-rt-rev-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rt_reversal', 'idem-rt-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — reversal total aceito', () => pm.response.to.have.status(200));",
+                  "pm.test('idempotent = false', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rt_reversal}}\",\n  \"type\": \"REVERSAL_PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rt_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-001\", \"mcc\": \"5411\", \"name\": \"Loja ABC\", \"city\": \"RJ\", \"state\": \"RJ\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rt_reversal}}\",\n    \"created_at\": \"2024-06-01T11:05:00Z\",\n    \"idempotency_key\": \"{{idem_rt_reversal}}\"\n  },\n  \"user_id\": \"user-001\", \"card_id\": \"card-001\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔄 04 · REVERSAL — Parcial",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (base)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rp_purchase', 'tx-rp-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rp_purchase', 'idem-rp-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rp_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-002\", \"mcc\": \"5812\", \"name\": \"Restaurante XYZ\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rp_purchase}}\",\n    \"created_at\": \"2024-06-01T12:00:00Z\",\n    \"idempotency_key\": \"{{idem_rp_purchase}}\"\n  },\n  \"user_id\": \"user-002\", \"card_id\": \"card-002\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REVERSAL_PURCHASE (50% do valor) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rp_reversal', 'tx-rp-rev-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rp_reversal', 'idem-rp-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — reversal parcial aceito', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rp_reversal}}\",\n  \"type\": \"REVERSAL_PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rp_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 5000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 5000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 5000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 5000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-002\", \"mcc\": \"5812\", \"name\": \"Restaurante XYZ\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rp_reversal}}\",\n    \"created_at\": \"2024-06-01T12:10:00Z\",\n    \"idempotency_key\": \"{{idem_rp_reversal}}\"\n  },\n  \"user_id\": \"user-002\", \"card_id\": \"card-002\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💸 05 · REFUND — Total",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (base)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rft_purchase', 'tx-rft-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rft_purchase', 'idem-rft-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rft_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 20000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 20000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 20000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 20000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-003\", \"mcc\": \"5651\", \"name\": \"Loja de Roupas Fashion\", \"city\": \"Curitiba\", \"state\": \"PR\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rft_purchase}}\",\n    \"created_at\": \"2024-06-02T09:00:00Z\",\n    \"idempotency_key\": \"{{idem_rft_purchase}}\"\n  },\n  \"user_id\": \"user-003\", \"card_id\": \"card-003\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REFUND (valor total) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rft_refund', 'tx-rft-refund-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rft_refund', 'idem-rft-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — refund total aceito', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rft_refund}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rft_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 20000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 20000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 20000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 20000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-003\", \"mcc\": \"5651\", \"name\": \"Loja de Roupas Fashion\", \"city\": \"Curitiba\", \"state\": \"PR\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rft_refund}}\",\n    \"created_at\": \"2024-06-02T09:15:00Z\",\n    \"idempotency_key\": \"{{idem_rft_refund}}\"\n  },\n  \"user_id\": \"user-003\", \"card_id\": \"card-003\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💸 06 · REFUND — Parcial único",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (base)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rfp1_purchase', 'tx-rfp1-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rfp1_purchase', 'idem-rfp1-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rfp1_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 15000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 15000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 15000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 15000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-004\", \"mcc\": \"5999\", \"name\": \"Marketplace Digital\", \"city\": \"BH\", \"state\": \"MG\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rfp1_purchase}}\",\n    \"created_at\": \"2024-06-03T14:00:00Z\",\n    \"idempotency_key\": \"{{idem_rfp1_purchase}}\"\n  },\n  \"user_id\": \"user-004\", \"card_id\": \"card-004\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REFUND (30% do valor) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rfp1_refund', 'tx-rfp1-refund-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rfp1_refund', 'idem-rfp1-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — refund parcial aceito', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rfp1_refund}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rfp1_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 4500, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 4500, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 4500, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 4500, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-004\", \"mcc\": \"5999\", \"name\": \"Marketplace Digital\", \"city\": \"BH\", \"state\": \"MG\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rfp1_refund}}\",\n    \"created_at\": \"2024-06-03T14:30:00Z\",\n    \"idempotency_key\": \"{{idem_rfp1_refund}}\"\n  },\n  \"user_id\": \"user-004\", \"card_id\": \"card-004\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💸 07 · REFUND — Parcial múltiplo (soma = total)",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (base R$300)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rfpm_purchase', 'tx-rfpm-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rfpm_purchase', 'idem-rfpm-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rfpm_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 30000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 30000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 30000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 30000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-005\", \"mcc\": \"5944\", \"name\": \"Joalheria Premium\", \"city\": \"Porto Alegre\", \"state\": \"RS\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rfpm_purchase}}\",\n    \"created_at\": \"2024-06-04T10:00:00Z\",\n    \"idempotency_key\": \"{{idem_rfpm_purchase}}\"\n  },\n  \"user_id\": \"user-005\", \"card_id\": \"card-005\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REFUND #1 (R$150 = 50%) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rfpm_refund1', 'tx-rfpm-r1-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rfpm_refund1', 'idem-rfpm-r1-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — 1° refund parcial R$150', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rfpm_refund1}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rfpm_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 15000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 15000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 15000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 15000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-005\", \"mcc\": \"5944\", \"name\": \"Joalheria Premium\", \"city\": \"Porto Alegre\", \"state\": \"RS\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rfpm_refund1}}\",\n    \"created_at\": \"2024-06-04T11:00:00Z\",\n    \"idempotency_key\": \"{{idem_rfpm_refund1}}\"\n  },\n  \"user_id\": \"user-005\", \"card_id\": \"card-005\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "3. POST REFUND #2 (R$150 — acumulado R$300 = total) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rfpm_refund2', 'tx-rfpm-r2-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rfpm_refund2', 'idem-rfpm-r2-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — 2° refund parcial (R$150+R$150 = R$300 = total)', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rfpm_refund2}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rfpm_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 15000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 15000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 15000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 15000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-005\", \"mcc\": \"5944\", \"name\": \"Joalheria Premium\", \"city\": \"Porto Alegre\", \"state\": \"RS\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rfpm_refund2}}\",\n    \"created_at\": \"2024-06-04T12:00:00Z\",\n    \"idempotency_key\": \"{{idem_rfpm_refund2}}\"\n  },\n  \"user_id\": \"user-005\", \"card_id\": \"card-005\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚫 08 · REFUND — Excede valor original → 409",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (R$100)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rfex_purchase', 'tx-rfex-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rfex_purchase', 'idem-rfex-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rfex_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-001\", \"mcc\": \"5411\", \"name\": \"Supermercado Central\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rfex_purchase}}\",\n    \"created_at\": \"2024-06-05T08:00:00Z\",\n    \"idempotency_key\": \"{{idem_rfex_purchase}}\"\n  },\n  \"user_id\": \"user-001\", \"card_id\": \"card-001\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REFUND (R$150 > R$100) → 409",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rfex_refund', 'tx-rfex-refund-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rfex_refund', 'idem-rfex-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 — excede valor original', () => pm.response.to.have.status(409));",
+                  "pm.test('code = EXCEEDS_ORIGINAL_AMOUNT', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('EXCEEDS_ORIGINAL_AMOUNT');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rfex_refund}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rfex_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 15000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 15000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 15000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 15000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-001\", \"mcc\": \"5411\", \"name\": \"Supermercado Central\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rfex_refund}}\",\n    \"created_at\": \"2024-06-05T08:20:00Z\",\n    \"idempotency_key\": \"{{idem_rfex_refund}}\"\n  },\n  \"user_id\": \"user-001\", \"card_id\": \"card-001\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚫 09 · REVERSAL após REFUND parcial → 409",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (R$100)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rapf_purchase', 'tx-rapf-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rapf_purchase', 'idem-rapf-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rapf_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-006\", \"mcc\": \"7011\", \"name\": \"Hotel Luxo\", \"city\": \"Florianópolis\", \"state\": \"SC\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rapf_purchase}}\",\n    \"created_at\": \"2024-06-06T15:00:00Z\",\n    \"idempotency_key\": \"{{idem_rapf_purchase}}\"\n  },\n  \"user_id\": \"user-006\", \"card_id\": \"card-006\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REFUND parcial (R$60) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rapf_refund', 'tx-rapf-refund-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rapf_refund', 'idem-rapf-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — refund parcial aceito', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rapf_refund}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rapf_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 6000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 6000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 6000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 6000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-006\", \"mcc\": \"7011\", \"name\": \"Hotel Luxo\", \"city\": \"Florianópolis\", \"state\": \"SC\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rapf_refund}}\",\n    \"created_at\": \"2024-06-06T15:10:00Z\",\n    \"idempotency_key\": \"{{idem_rapf_refund}}\"\n  },\n  \"user_id\": \"user-006\", \"card_id\": \"card-006\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "3. POST REVERSAL total (R$100 + R$60 já usado = supera) → 409",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rapf_reversal', 'tx-rapf-rev-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rapf_reversal', 'idem-rapf-rv-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 — reversal excede saldo disponível', () => pm.response.to.have.status(409));",
+                  "pm.test('code = EXCEEDS_ORIGINAL_AMOUNT', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('EXCEEDS_ORIGINAL_AMOUNT');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rapf_reversal}}\",\n  \"type\": \"REVERSAL_PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rapf_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-006\", \"mcc\": \"7011\", \"name\": \"Hotel Luxo\", \"city\": \"Florianópolis\", \"state\": \"SC\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rapf_reversal}}\",\n    \"created_at\": \"2024-06-06T15:20:00Z\",\n    \"idempotency_key\": \"{{idem_rapf_reversal}}\"\n  },\n  \"user_id\": \"user-006\", \"card_id\": \"card-006\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔁 10 · Idempotência — Mesmo evento duplicado",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (1ª entrega)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_idem', 'tx-idem-' + Date.now());",
+                  "pm.collectionVariables.set('idem_idem', 'idem-fixed-key-12345');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — 1ª entrega', () => pm.response.to.have.status(200));",
+                  "pm.test('idempotent = false', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_idem}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 7500, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 7500, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 7500, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 7500, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-007\", \"mcc\": \"5045\", \"name\": \"Tech Store\", \"city\": \"Brasília\", \"state\": \"DF\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_idem}}\",\n    \"created_at\": \"2024-06-07T09:00:00Z\",\n    \"idempotency_key\": \"{{idem_idem}}\"\n  },\n  \"user_id\": \"user-007\", \"card_id\": \"card-007\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST mesma idempotency_key (retry da rede) → 200 idempotent=true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — retry aceito', () => pm.response.to.have.status(200));",
+                  "pm.test('idempotent = true', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(true);",
+                  "});",
+                  "pm.test('Mensagem indica duplicata', () => {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.message).to.include('already processed');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_idem}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 7500, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 7500, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 7500, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 7500, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-007\", \"mcc\": \"5045\", \"name\": \"Tech Store\", \"city\": \"Brasília\", \"state\": \"DF\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_idem}}\",\n    \"created_at\": \"2024-06-07T09:00:00Z\",\n    \"idempotency_key\": \"{{idem_idem}}\"\n  },\n  \"user_id\": \"user-007\", \"card_id\": \"card-007\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔀 11 · Out-of-Order — REFUND antes do PURCHASE",
+      "item": [
+        {
+          "name": "1. POST REFUND (original ainda não existe) → 404",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('tx_ooo_purchase', 'tx-ooo-purchase-' + ts);",
+                  "pm.collectionVariables.set('tx_ooo_refund', 'tx-ooo-refund-' + ts);",
+                  "pm.collectionVariables.set('idem_ooo_purchase', 'idem-ooo-p-' + ts);",
+                  "pm.collectionVariables.set('idem_ooo_refund1', 'idem-ooo-r1-' + ts);",
+                  "pm.collectionVariables.set('idem_ooo_refund2', 'idem-ooo-r2-' + ts);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404 — original não existe ainda', () => pm.response.to.have.status(404));",
+                  "pm.test('code = NOT_FOUND', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_ooo_refund}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_ooo_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 5000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 5000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 5000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 5000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-008\", \"mcc\": \"5411\", \"name\": \"Mini Mercado\", \"city\": \"Recife\", \"state\": \"PE\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_ooo_refund}}-1\",\n    \"created_at\": \"2024-06-08T10:00:00Z\",\n    \"idempotency_key\": \"{{idem_ooo_refund1}}\"\n  },\n  \"user_id\": \"user-008\", \"card_id\": \"card-008\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST PURCHASE APPROVED (chega atrasado) → 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — purchase criada', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_ooo_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-008\", \"mcc\": \"5411\", \"name\": \"Mini Mercado\", \"city\": \"Recife\", \"state\": \"PE\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_ooo_purchase}}\",\n    \"created_at\": \"2024-06-08T09:50:00Z\",\n    \"idempotency_key\": \"{{idem_ooo_purchase}}\"\n  },\n  \"user_id\": \"user-008\", \"card_id\": \"card-008\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "3. POST REFUND retry (nova idem key) → 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — retry após purchase criada', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_ooo_refund}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_ooo_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 5000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 5000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 5000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 5000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-008\", \"mcc\": \"5411\", \"name\": \"Mini Mercado\", \"city\": \"Recife\", \"state\": \"PE\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_ooo_refund}}-2\",\n    \"created_at\": \"2024-06-08T10:05:00Z\",\n    \"idempotency_key\": \"{{idem_ooo_refund2}}\"\n  },\n  \"user_id\": \"user-008\", \"card_id\": \"card-008\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔁 12 · Webhook Retry — Nova idem key, mesmo tx_id",
+      "item": [
+        {
+          "name": "1. POST PURCHASE (1ª entrega)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_retry', 'tx-retry-' + Date.now());",
+                  "pm.collectionVariables.set('idem_retry_1', 'idem-retry-delivery1-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_retry}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 9900, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 9900, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 9900, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 9900, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-009\", \"mcc\": \"5912\", \"name\": \"Farmácia Saúde\", \"city\": \"Manaus\", \"state\": \"AM\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_retry}}-1\",\n    \"created_at\": \"2024-06-09T07:00:00Z\",\n    \"idempotency_key\": \"{{idem_retry_1}}\"\n  },\n  \"user_id\": \"user-009\", \"card_id\": \"card-009\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST mesma PURCHASE nova idem key (nova entrega) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('idem_retry_2', 'idem-retry-delivery2-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — aceita nova entrega', () => pm.response.to.have.status(200));",
+                  "pm.test('idempotent = false (chave diferente)', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_retry}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 9900, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 9900, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 9900, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 9900, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-009\", \"mcc\": \"5912\", \"name\": \"Farmácia Saúde\", \"city\": \"Manaus\", \"state\": \"AM\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_retry}}-2\",\n    \"created_at\": \"2024-06-09T07:01:00Z\",\n    \"idempotency_key\": \"{{idem_retry_2}}\"\n  },\n  \"user_id\": \"user-009\", \"card_id\": \"card-009\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚫 13 · Ajuste em PURCHASE Rejeitada → 409",
+      "item": [
+        {
+          "name": "1. POST PURCHASE REJECTED",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_adj_rej', 'tx-adj-rej-' + Date.now());",
+                  "pm.collectionVariables.set('idem_adj_rej_p', 'idem-adj-rej-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_adj_rej}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"REJECTED\",\n  \"amount\": {\n    \"local\":       { \"total\": 5000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 5000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 5000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 5000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-010\", \"mcc\": \"5999\", \"name\": \"Loja Genérica\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_adj_rej}}\",\n    \"created_at\": \"2024-06-10T08:00:00Z\",\n    \"idempotency_key\": \"{{idem_adj_rej_p}}\"\n  },\n  \"user_id\": \"user-010\", \"card_id\": \"card-010\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REFUND sobre PURCHASE REJECTED → 409",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_adj_rej_r', 'tx-adj-rej-r-' + Date.now());",
+                  "pm.collectionVariables.set('idem_adj_rej_r', 'idem-adj-rej-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 — purchase estava rejeitada', () => pm.response.to.have.status(409));",
+                  "pm.test('code = PURCHASE_NOT_APPROVED', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('PURCHASE_NOT_APPROVED');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_adj_rej_r}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_adj_rej}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 3000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 3000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 3000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 3000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-010\", \"mcc\": \"5999\", \"name\": \"Loja Genérica\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_adj_rej_r}}\",\n    \"created_at\": \"2024-06-10T08:30:00Z\",\n    \"idempotency_key\": \"{{idem_adj_rej_r}}\"\n  },\n  \"user_id\": \"user-010\", \"card_id\": \"card-010\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 14 · Validação de Campos",
+      "item": [
+        {
+          "name": "POST sem id → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400 — id ausente', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 1000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 1000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 1000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 1000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"M\", \"name\": \"X\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": { \"id\": \"e1\", \"created_at\": \"2024-01-01T00:00:00Z\", \"idempotency_key\": \"k1\" },\n  \"user_id\": \"u\", \"card_id\": \"c\", \"country\": \"BR\", \"currency\": \"BRL\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST sem idempotency_key → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400 — idempotency_key ausente', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"tx-val-001\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 1000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 1000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 1000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 1000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"M\", \"name\": \"X\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": { \"id\": \"e1\", \"created_at\": \"2024-01-01T00:00:00Z\", \"idempotency_key\": \"\" },\n  \"user_id\": \"u\", \"card_id\": \"c\", \"country\": \"BR\", \"currency\": \"BRL\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST created_at inválido → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400 — created_at não é RFC3339', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"tx-val-002\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 1000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 1000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 1000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 1000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"M\", \"name\": \"X\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": { \"id\": \"e1\", \"created_at\": \"not-a-date\", \"idempotency_key\": \"k-val-002\" },\n  \"user_id\": \"u\", \"card_id\": \"c\", \"country\": \"BR\", \"currency\": \"BRL\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST corpo inválido (não é JSON) → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400 — corpo não é JSON', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "isso não é json"
+            }
+          }
+        },
+        {
+          "name": "POST REFUND sem original_transaction_id → 400",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('idem_nooriginal', 'idem-nooriginal-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400 — original_transaction_id obrigatório', () => pm.response.to.have.status(400));",
+                  "pm.test('code = ORIGINAL_TRANSACTION_REQUIRED', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('ORIGINAL_TRANSACTION_REQUIRED');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"tx-val-003\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 1000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 1000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 1000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 1000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"M\", \"name\": \"X\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": { \"id\": \"e1\", \"created_at\": \"2024-01-01T00:00:00Z\", \"idempotency_key\": \"{{idem_nooriginal}}\" },\n  \"user_id\": \"u\", \"card_id\": \"c\", \"country\": \"BR\", \"currency\": \"BRL\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📏 15 · Limites de Valor de Compra",
+      "item": [
+        {
+          "name": "POST PURCHASE valor mínimo R$1,00 (100 cents) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_vmin', 'tx-vmin-' + Date.now());",
+                  "pm.collectionVariables.set('idem_vmin', 'idem-vmin-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — valor mínimo R$1,00 aceito', () => pm.response.to.have.status(200));",
+                  "pm.test('idempotent = false', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_vmin}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 100, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 100, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 100, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 100, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-011\", \"mcc\": \"5411\", \"name\": \"Barraca do Zé\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_vmin}}\",\n    \"created_at\": \"2024-06-11T08:00:00Z\",\n    \"idempotency_key\": \"{{idem_vmin}}\"\n  },\n  \"user_id\": \"user-011\", \"card_id\": \"card-011\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST PURCHASE valor máximo R$5.000,00 (500000 cents) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_vmax', 'tx-vmax-' + Date.now());",
+                  "pm.collectionVariables.set('idem_vmax', 'idem-vmax-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — valor máximo R$5.000,00 aceito', () => pm.response.to.have.status(200));",
+                  "pm.test('idempotent = false', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_vmax}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 500000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 500000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 500000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 500000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-011\", \"mcc\": \"5944\", \"name\": \"Loja Luxo\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_vmax}}\",\n    \"created_at\": \"2024-06-11T09:00:00Z\",\n    \"idempotency_key\": \"{{idem_vmax}}\"\n  },\n  \"user_id\": \"user-011\", \"card_id\": \"card-011\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST PURCHASE R$0,50 (abaixo do mínimo) → 422",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('idem_vlow', 'idem-vlow-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422 — valor abaixo do mínimo', () => pm.response.to.have.status(422));",
+                  "pm.test('code = AMOUNT_OUT_OF_RANGE', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('AMOUNT_OUT_OF_RANGE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"tx-vlow-001\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 50, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 50, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 50, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 50, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-011\", \"mcc\": \"5411\", \"name\": \"Barraca do Zé\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-vlow-001\",\n    \"created_at\": \"2024-06-11T10:00:00Z\",\n    \"idempotency_key\": \"{{idem_vlow}}\"\n  },\n  \"user_id\": \"user-011\", \"card_id\": \"card-011\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST PURCHASE R$6.000,00 (acima do máximo) → 422",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('idem_vhigh', 'idem-vhigh-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422 — valor acima do máximo', () => pm.response.to.have.status(422));",
+                  "pm.test('code = AMOUNT_OUT_OF_RANGE', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('AMOUNT_OUT_OF_RANGE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"tx-vhigh-001\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 600000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 600000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 600000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 600000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-011\", \"mcc\": \"5944\", \"name\": \"Loja Luxo\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-vhigh-001\",\n    \"created_at\": \"2024-06-11T11:00:00Z\",\n    \"idempotency_key\": \"{{idem_vhigh}}\"\n  },\n  \"user_id\": \"user-011\", \"card_id\": \"card-011\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST PURCHASE valor negativo → 400",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('idem_vneg', 'idem-vneg-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400 — valor negativo rejeitado', () => pm.response.to.have.status(400));",
+                  "pm.test('code = NEGATIVE_AMOUNT', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('NEGATIVE_AMOUNT');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"tx-vneg-001\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": -100, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": -100, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": -100, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": -100, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-011\", \"mcc\": \"5411\", \"name\": \"Barraca do Zé\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-vneg-001\",\n    \"created_at\": \"2024-06-11T12:00:00Z\",\n    \"idempotency_key\": \"{{idem_vneg}}\"\n  },\n  \"user_id\": \"user-011\", \"card_id\": \"card-011\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚫 16 · REVERSAL — Excede Valor Original → 409",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (R$100)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rex_purchase', 'tx-rex-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rex_purchase', 'idem-rex-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rex_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-012\", \"mcc\": \"5812\", \"name\": \"Café Gourmet\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rex_purchase}}\",\n    \"created_at\": \"2024-06-12T08:00:00Z\",\n    \"idempotency_key\": \"{{idem_rex_purchase}}\"\n  },\n  \"user_id\": \"user-012\", \"card_id\": \"card-012\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REVERSAL_PURCHASE R$150 (> R$100 original) → 409",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rex_reversal', 'tx-rex-rev-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rex_reversal', 'idem-rex-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 — reversal excede valor original', () => pm.response.to.have.status(409));",
+                  "pm.test('code = EXCEEDS_ORIGINAL_AMOUNT', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('EXCEEDS_ORIGINAL_AMOUNT');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rex_reversal}}\",\n  \"type\": \"REVERSAL_PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rex_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 15000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 15000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 15000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 15000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-012\", \"mcc\": \"5812\", \"name\": \"Café Gourmet\", \"city\": \"SP\", \"state\": \"SP\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rex_reversal}}\",\n    \"created_at\": \"2024-06-12T08:10:00Z\",\n    \"idempotency_key\": \"{{idem_rex_reversal}}\"\n  },\n  \"user_id\": \"user-012\", \"card_id\": \"card-012\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚫 17 · REVERSAL em PURCHASE Rejeitada → 409",
+      "item": [
+        {
+          "name": "1. POST PURCHASE REJECTED",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rvrj_purchase', 'tx-rvrj-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rvrj_purchase', 'idem-rvrj-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rvrj_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"REJECTED\",\n  \"amount\": {\n    \"local\":       { \"total\": 8000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 8000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 8000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 8000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-013\", \"mcc\": \"5999\", \"name\": \"Loja Online\", \"city\": \"RJ\", \"state\": \"RJ\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rvrj_purchase}}\",\n    \"created_at\": \"2024-06-13T10:00:00Z\",\n    \"idempotency_key\": \"{{idem_rvrj_purchase}}\"\n  },\n  \"user_id\": \"user-013\", \"card_id\": \"card-013\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REVERSAL_PURCHASE em REJECTED → 409",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_rvrj_reversal', 'tx-rvrj-rev-' + Date.now());",
+                  "pm.collectionVariables.set('idem_rvrj_reversal', 'idem-rvrj-r-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 — reversal em purchase rejeitada', () => pm.response.to.have.status(409));",
+                  "pm.test('code = PURCHASE_NOT_APPROVED', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('PURCHASE_NOT_APPROVED');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_rvrj_reversal}}\",\n  \"type\": \"REVERSAL_PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_rvrj_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 8000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 8000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 8000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 8000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-013\", \"mcc\": \"5999\", \"name\": \"Loja Online\", \"city\": \"RJ\", \"state\": \"RJ\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_rvrj_reversal}}\",\n    \"created_at\": \"2024-06-13T10:15:00Z\",\n    \"idempotency_key\": \"{{idem_rvrj_reversal}}\"\n  },\n  \"user_id\": \"user-013\", \"card_id\": \"card-013\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚫 18 · Ajustes Acumulados Excedem Total → 409",
+      "item": [
+        {
+          "name": "1. POST PURCHASE APPROVED (R$100)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_mae_purchase', 'tx-mae-purchase-' + Date.now());",
+                  "pm.collectionVariables.set('idem_mae_purchase', 'idem-mae-p-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_mae_purchase}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 10000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 10000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 10000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 10000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-014\", \"mcc\": \"5045\", \"name\": \"Eletro Plus\", \"city\": \"BH\", \"state\": \"MG\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_mae_purchase}}\",\n    \"created_at\": \"2024-06-14T09:00:00Z\",\n    \"idempotency_key\": \"{{idem_mae_purchase}}\"\n  },\n  \"user_id\": \"user-014\", \"card_id\": \"card-014\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST REFUND #1 (R$60) → 200",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_mae_refund1', 'tx-mae-r1-' + Date.now());",
+                  "pm.collectionVariables.set('idem_mae_refund1', 'idem-mae-r1-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 — 1° refund R$60 aceito', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_mae_refund1}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_mae_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 6000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 6000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 6000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 6000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-014\", \"mcc\": \"5045\", \"name\": \"Eletro Plus\", \"city\": \"BH\", \"state\": \"MG\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_mae_refund1}}\",\n    \"created_at\": \"2024-06-14T09:30:00Z\",\n    \"idempotency_key\": \"{{idem_mae_refund1}}\"\n  },\n  \"user_id\": \"user-014\", \"card_id\": \"card-014\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "3. POST REFUND #2 (R$60 — acumulado R$120 > R$100) → 409",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('tx_mae_refund2', 'tx-mae-r2-' + Date.now());",
+                  "pm.collectionVariables.set('idem_mae_refund2', 'idem-mae-r2-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 — 2° refund excede saldo (R$60+R$60=R$120 > R$100)', () => pm.response.to.have.status(409));",
+                  "pm.test('code = EXCEEDS_ORIGINAL_AMOUNT', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('EXCEEDS_ORIGINAL_AMOUNT');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/webhook/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["webhook", "transactions"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{tx_mae_refund2}}\",\n  \"type\": \"REFUND\",\n  \"status\": \"APPROVED\",\n  \"original_transaction_id\": \"{{tx_mae_purchase}}\",\n  \"amount\": {\n    \"local\":       { \"total\": 6000, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 6000, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 6000, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 6000, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-014\", \"mcc\": \"5045\", \"name\": \"Eletro Plus\", \"city\": \"BH\", \"state\": \"MG\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_mae_refund2}}\",\n    \"created_at\": \"2024-06-14T10:00:00Z\",\n    \"idempotency_key\": \"{{idem_mae_refund2}}\"\n  },\n  \"user_id\": \"user-014\", \"card_id\": \"card-014\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"ONLINE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 19 · Consultas",
+      "item": [
+        {
+          "name": "GET /transactions (listar todas)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta é array', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"]
+            }
+          }
+        },
+        {
+          "name": "GET /transactions/:id (existente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Tem ID', () => {",
+                  "    pm.expect(pm.response.json().ID).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/transactions/{{tx_purchase_approved}}",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "{{tx_purchase_approved}}"]
+            }
+          }
+        },
+        {
+          "name": "GET /transactions/:id (não existe) → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('code = NOT_FOUND', () => {",
+                  "    pm.expect(pm.response.json().code).to.eql('NOT_FOUND');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/transactions/tx-nao-existe-9999",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "tx-nao-existe-9999"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
