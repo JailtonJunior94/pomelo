@@ -83,7 +83,7 @@ pomelo/
 └── simulator/
     └── mcp/
         ├── server.go           # servidor MCP JSON-RPC 2.0 stdin/stdout
-        └── scenarios.go        # 4 tools + 22 cenários pré-definidos
+        └── scenarios.go        # 4 tools + 29 cenários pré-definidos
 ```
 
 ---
@@ -242,7 +242,7 @@ curl http://localhost:8080/health
 
 ## Simulador MCP
 
-O simulador é um servidor **MCP (Model Context Protocol) JSON-RPC 2.0** que roda sobre stdin/stdout. Ele expõe 4 tools e 22 cenários pré-definidos.
+O simulador é um servidor **MCP (Model Context Protocol) JSON-RPC 2.0** que roda sobre stdin/stdout. Ele expõe 4 tools e **29 cenários pré-definidos**.
 
 ### Tools disponíveis
 
@@ -253,59 +253,90 @@ O simulador é um servidor **MCP (Model Context Protocol) JSON-RPC 2.0** que rod
 | `simulate_refund` | Dispara um REFUND |
 | `simulate_scenario` | Executa um cenário completo pré-definido |
 
+### Como usar com Claude Desktop / VS Code
+
+Adicione ao `claude_desktop_config.json` (ou equivalente do cliente MCP):
+
+```json
+{
+  "mcpServers": {
+    "pomelo-simulator": {
+      "command": "go",
+      "args": ["run", "./cmd/simulator"],
+      "cwd": "/caminho/para/pomelo",
+      "env": { "WEBHOOK_URL": "http://localhost:8080" }
+    }
+  }
+}
+```
+
+Depois basta pedir ao assistente: _"execute o cenário `refund_partial_multiple`"_ ou _"rode todos os cenários de reversal"_.
+
 ### Cenários pré-definidos (`simulate_scenario`)
 
 #### Compras básicas
 
-| Cenário | Passos | Resultado esperado |
+| Cenário | Passos | HTTP esperado |
 |---|---|---|
-| `purchase_approved` | PURCHASE APPROVED (R$100,00) | `200` |
-| `purchase_rejected` | PURCHASE REJECTED (R$100,00) | `200` |
-| `purchase_at_min_amount` | PURCHASE no valor mínimo R$1,00 | `200` |
-| `purchase_at_max_amount` | PURCHASE no valor máximo R$5.000,00 | `200` |
-| `purchase_amount_too_low` | PURCHASE R$0,50 (abaixo do mínimo) | `422` |
-| `purchase_amount_too_high` | PURCHASE R$6.000,00 (acima do máximo) | `422` |
+| `purchase_approved` | PURCHASE APPROVED R$100,00 | `200` |
+| `purchase_rejected` | PURCHASE REJECTED R$100,00 | `200` |
+| `purchase_at_min_amount` | PURCHASE no valor mínimo R$1,00 (100 cents) | `200` |
+| `purchase_at_max_amount` | PURCHASE no valor máximo R$5.000,00 (500.000 cents) | `200` |
+| `purchase_amount_too_low` | PURCHASE R$0,50 — abaixo do mínimo | `422` |
+| `purchase_amount_too_high` | PURCHASE R$6.000,00 — acima do máximo | `422` |
 | `purchase_negative_amount` | PURCHASE com valor negativo | `400` |
 
 #### Reversais (REVERSAL_PURCHASE)
 
-| Cenário | Passos | Resultado esperado |
+| Cenário | Passos | HTTP esperado |
 |---|---|---|
-| `reversal_total` | PURCHASE + REVERSAL total (R$100,00) | `200` + `200` |
-| `reversal_partial` | PURCHASE + REVERSAL parcial (R$50,00) | `200` + `200` |
-| `reversal_exceeds_amount` | PURCHASE + REVERSAL acima do valor original | `200` + `409` |
-| `reversal_on_rejected_purchase` | PURCHASE REJECTED + REVERSAL | `200` + `409` |
+| `reversal_total` | PURCHASE + REVERSAL total R$100,00 | `200` → `200` |
+| `reversal_partial` | PURCHASE + REVERSAL parcial R$50,00 | `200` → `200` |
+| `reversal_exceeds_amount` | PURCHASE + REVERSAL R$150 (> R$100 original) | `200` → `409` |
+| `reversal_on_rejected_purchase` | PURCHASE REJECTED + REVERSAL | `200` → `409` |
 
 #### Reembolsos (REFUND)
 
-| Cenário | Passos | Resultado esperado |
+| Cenário | Passos | HTTP esperado |
 |---|---|---|
-| `refund_total` | PURCHASE + REFUND total (R$100,00) | `200` + `200` |
-| `refund_partial_single` | PURCHASE + REFUND parcial (R$40,00) | `200` + `200` |
-| `refund_partial_multiple` | PURCHASE R$300 + REFUND₁ R$150 + REFUND₂ R$150 (soma = total) | `200` + `200` + `200` |
-| `refund_exceeds_amount` | PURCHASE + REFUND acima do valor original | `200` + `409` |
-| `refund_on_rejected_purchase` | PURCHASE REJECTED + REFUND | `200` + `409` |
-| `multiple_adjustments_exceed` | PURCHASE + REFUND₁ R$60 + REFUND₂ R$60 (acumulado > R$100) | `200` + `200` + `409` |
+| `refund_total` | PURCHASE + REFUND total R$100,00 | `200` → `200` |
+| `refund_partial_single` | PURCHASE + REFUND parcial R$40,00 | `200` → `200` |
+| `refund_partial_multiple` | PURCHASE R$300 + REFUND₁ R$150 + REFUND₂ R$150 (soma = total) | `200` → `200` → `200` |
+| `refund_exceeds_amount` | PURCHASE + REFUND R$150 (> R$100 original) | `200` → `409` |
+| `refund_on_rejected_purchase` | PURCHASE REJECTED + REFUND | `200` → `409` |
+| `multiple_adjustments_exceed` | PURCHASE R$100 + REFUND₁ R$60 + REFUND₂ R$60 (acumulado R$120 > R$100) | `200` → `200` → `409` |
 
 #### Ajustes mistos
 
-| Cenário | Passos | Resultado esperado |
+| Cenário | Passos | HTTP esperado |
 |---|---|---|
-| `reversal_after_partial_refund` | PURCHASE + REFUND R$60 + REVERSAL R$100 (acumulado > original) | `200` + `200` + `409` |
+| `reversal_after_partial_refund` | PURCHASE R$100 + REFUND R$60 + REVERSAL R$100 (acumulado > original) | `200` → `200` → `409` |
 
 #### Idempotência e entrega
 
-| Cenário | Passos | Resultado esperado |
+| Cenário | Passos | HTTP esperado |
 |---|---|---|
-| `duplicate_event` | PURCHASE × 2 (mesma `idempotency_key`) | `200` + `200` (`idempotent=true`) |
-| `out_of_order` | REFUND sem PURCHASE → PURCHASE → REFUND retry | `404` + `200` + `200` |
-| `webhook_retry` | PURCHASE + retry (nova `idempotency_key`, mesmo ID) | `200` + `200` |
+| `duplicate_event` | PURCHASE + reenvio com a **mesma** `idempotency_key` | `200` → `200` (`idempotent=true`) |
+| `out_of_order` | REFUND sem PURCHASE → PURCHASE → REFUND retry | `404` → `200` → `200` |
+| `webhook_retry` | PURCHASE + retry de rede (mesma `idempotency_key`, mesmo `tx_id`) | `200` → `200` (`idempotent=true`) |
 
 #### Erros de validação
 
-| Cenário | Passos | Resultado esperado |
+| Cenário | Passos | HTTP esperado |
 |---|---|---|
-| `missing_original_transaction_id` | REFUND sem `original_transaction_id` | `400` |
+| `missing_original_transaction_id` | REFUND sem `original_transaction_id` | `400` (`ORIGINAL_TRANSACTION_REQUIRED`) |
+| `missing_id` | POST sem campo `id` | `400` |
+| `missing_idempotency_key` | POST com `idempotency_key` vazia | `400` |
+| `invalid_created_at` | POST com `created_at` em formato inválido (non-RFC3339) | `400` |
+| `invalid_json_body` | POST com corpo que não é JSON | `400` |
+
+#### Consultas
+
+| Cenário | Passos | HTTP esperado |
+|---|---|---|
+| `list_transactions` | PURCHASE seed → GET `/transactions` | `200` → `200` (array) |
+| `get_transaction_existing` | PURCHASE seed → GET `/transactions/:id` | `200` → `200` |
+| `get_transaction_not_found` | GET `/transactions/id-inexistente` | `404` (`NOT_FOUND`) |
 
 ---
 
@@ -377,14 +408,29 @@ go test -race ./internal/adapters/...
 A collection e o environment estão prontos para importar:
 
 ```
-pomelo-webhook.postman_collection.json   # 37 requests, 16 pastas, testes automáticos
-pomelo-local.postman_environment.json    # base_url + 56 variáveis de runtime
+docs/pomelo-webhook.postman_collection.json   # 70+ requests, 19 pastas, testes automáticos
+docs/pomelo-local.postman_environment.json    # base_url + variáveis de runtime
 ```
 
 **Importar:**
-1. Postman → **Import** → selecione os dois arquivos
+1. Postman → **Import** → selecione os dois arquivos de `docs/`
 2. Selecione o environment **Pomelo Local** no canto superior direito
-3. Start server → **Run collection**
+3. Inicie o servidor (`go run ./cmd/server`) → **Run collection**
+
+As pastas cobrem os mesmos 29 cenários do simulador MCP, organizadas por categoria:
+
+| Pasta | Cenários |
+|---|---|
+| 01–02 | PURCHASE aprovada e rejeitada |
+| 03–04 | REVERSAL total e parcial |
+| 05–07 | REFUND total, parcial único, parcial múltiplo |
+| 08–09 | REFUND e REVERSAL excedendo o valor original |
+| 10–12 | Idempotência, out-of-order, webhook retry |
+| 13 | Ajuste em PURCHASE rejeitada |
+| 14 | Validação de campos obrigatórios |
+| 15 | Limites de valor (mínimo, máximo, negativo) |
+| 16–18 | REVERSAL/REFUND com erros de conflito |
+| 19 | Consultas (listar, buscar por ID, 404) |
 
 ---
 
