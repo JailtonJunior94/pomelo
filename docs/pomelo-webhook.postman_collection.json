@@ -22,8 +22,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/health",
-              "host": ["{{base_url}}"],
-              "path": ["health"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           },
           "event": [
@@ -79,11 +83,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -114,8 +128,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/transactions/{{tx_purchase_approved}}",
-              "host": ["{{base_url}}"],
-              "path": ["transactions", "{{tx_purchase_approved}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions",
+                "{{tx_purchase_approved}}"
+              ]
             }
           }
         }
@@ -152,11 +171,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -194,11 +223,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -234,11 +273,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -276,11 +325,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -313,11 +372,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -355,11 +424,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -392,11 +471,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -434,11 +523,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -471,11 +570,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -513,11 +622,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -550,11 +669,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -587,11 +716,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -629,11 +768,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -669,11 +818,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -711,11 +870,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -748,11 +917,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -788,11 +967,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -833,11 +1022,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -867,11 +1066,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -916,11 +1125,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -943,11 +1162,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -970,11 +1199,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -985,7 +1224,7 @@
       ]
     },
     {
-      "name": "🔁 12 · Webhook Retry — Nova idem key, mesmo tx_id",
+      "name": "🔁 12 · Webhook Retry — Mesma idem key, mesmo tx_id",
       "item": [
         {
           "name": "1. POST PURCHASE (1ª entrega)",
@@ -1012,11 +1251,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1025,25 +1274,16 @@
           }
         },
         {
-          "name": "2. POST mesma PURCHASE nova idem key (nova entrega) → 200",
+          "name": "2. POST mesma PURCHASE mesma idem key (retry de rede) → 200 idempotent=true",
           "event": [
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.collectionVariables.set('idem_retry_2', 'idem-retry-delivery2-' + Date.now());"
-                ]
-              }
-            },
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status 200 — aceita nova entrega', () => pm.response.to.have.status(200));",
-                  "pm.test('idempotent = false (chave diferente)', () => {",
-                  "    pm.expect(pm.response.json().idempotent).to.eql(false);",
+                  "pm.test('Status 200 — evento duplicado aceito', () => pm.response.to.have.status(200));",
+                  "pm.test('idempotent = true (mesma chave)', () => {",
+                  "    pm.expect(pm.response.json().idempotent).to.eql(true);",
                   "});"
                 ]
               }
@@ -1051,15 +1291,25 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"{{tx_retry}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 9900, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 9900, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 9900, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 9900, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-009\", \"mcc\": \"5912\", \"name\": \"Farmácia Saúde\", \"city\": \"Manaus\", \"state\": \"AM\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_retry}}-2\",\n    \"created_at\": \"2024-06-09T07:01:00Z\",\n    \"idempotency_key\": \"{{idem_retry_2}}\"\n  },\n  \"user_id\": \"user-009\", \"card_id\": \"card-009\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
+              "raw": "{\n  \"id\": \"{{tx_retry}}\",\n  \"type\": \"PURCHASE\",\n  \"status\": \"APPROVED\",\n  \"amount\": {\n    \"local\":       { \"total\": 9900, \"currency\": \"BRL\" },\n    \"transaction\": { \"total\": 9900, \"currency\": \"BRL\" },\n    \"settlement\":  { \"total\": 9900, \"currency\": \"BRL\" },\n    \"original\":    { \"total\": 9900, \"currency\": \"BRL\" }\n  },\n  \"merchant\": { \"id\": \"MERCH-009\", \"mcc\": \"5912\", \"name\": \"Farmácia Saúde\", \"city\": \"Manaus\", \"state\": \"AM\" },\n  \"event\": {\n    \"id\": \"evt-{{tx_retry}}-1\",\n    \"created_at\": \"2024-06-09T07:01:00Z\",\n    \"idempotency_key\": \"{{idem_retry_1}}\"\n  },\n  \"user_id\": \"user-009\", \"card_id\": \"card-009\", \"country\": \"BR\", \"currency\": \"BRL\", \"point_of_sale\": \"POS\"\n}"
             }
           }
         }
@@ -1093,11 +1343,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1133,11 +1393,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1165,11 +1435,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1192,11 +1472,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1219,11 +1509,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1246,11 +1546,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1285,11 +1595,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1330,11 +1650,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1370,11 +1700,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1409,11 +1749,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1448,11 +1798,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1487,11 +1847,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1529,11 +1899,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1569,11 +1949,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1611,11 +2001,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1651,11 +2051,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1693,11 +2103,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1730,11 +2150,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1770,11 +2200,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/webhook/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["webhook", "transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "webhook",
+                "transactions"
+              ]
             },
             "body": {
               "mode": "raw",
@@ -1807,8 +2247,12 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["transactions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
             }
           }
         },
@@ -1832,8 +2276,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/transactions/{{tx_purchase_approved}}",
-              "host": ["{{base_url}}"],
-              "path": ["transactions", "{{tx_purchase_approved}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions",
+                "{{tx_purchase_approved}}"
+              ]
             }
           }
         },
@@ -1857,8 +2306,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/transactions/tx-nao-existe-9999",
-              "host": ["{{base_url}}"],
-              "path": ["transactions", "tx-nao-existe-9999"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions",
+                "tx-nao-existe-9999"
+              ]
             }
           }
         }

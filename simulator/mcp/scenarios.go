@@ -47,6 +47,43 @@ func (r *scenarioRunner) post(desc string, body map[string]any, expectedStatus i
 	return r.request(http.MethodPost, r.baseURL+"/webhook/transactions", desc, body, expectedStatus)
 }
 
+func (r *scenarioRunner) get(desc, url string, expectedStatus int) (map[string]any, error) {
+	return r.request(http.MethodGet, url, desc, nil, expectedStatus)
+}
+
+func (r *scenarioRunner) postRaw(desc string, rawBody []byte, expectedStatus int) (map[string]any, error) {
+	step := StepResult{
+		Step:           len(r.steps) + 1,
+		Description:    desc,
+		Method:         http.MethodPost,
+		URL:            r.baseURL + "/webhook/transactions",
+		RequestBody:    string(rawBody),
+		ExpectedStatus: expectedStatus,
+	}
+
+	req, err := http.NewRequest(http.MethodPost, r.baseURL+"/webhook/transactions", bytes.NewReader(rawBody))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := r.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	step.ResponseStatus = resp.StatusCode
+	step.Passed = resp.StatusCode == expectedStatus
+
+	var respBody map[string]any
+	json.NewDecoder(resp.Body).Decode(&respBody)
+	step.ResponseBody = respBody
+
+	r.steps = append(r.steps, step)
+	return respBody, nil
+}
+
 func (r *scenarioRunner) request(method, url, desc string, body any, expectedStatus int) (map[string]any, error) {
 	step := StepResult{
 		Step:           len(r.steps) + 1,
@@ -211,6 +248,21 @@ func runScenario(baseURL, scenario string) (ScenarioResult, error) {
 	// ── Validation error flows ────────────────────────────────────────────
 	case "missing_original_transaction_id":
 		return scenarioMissingOriginalTransactionID(baseURL)
+	case "missing_id":
+		return scenarioMissingID(baseURL)
+	case "missing_idempotency_key":
+		return scenarioMissingIdempotencyKey(baseURL)
+	case "invalid_created_at":
+		return scenarioInvalidCreatedAt(baseURL)
+	case "invalid_json_body":
+		return scenarioInvalidJSONBody(baseURL)
+	// ── Query flows ───────────────────────────────────────────────────────
+	case "list_transactions":
+		return scenarioListTransactions(baseURL)
+	case "get_transaction_existing":
+		return scenarioGetTransactionExisting(baseURL)
+	case "get_transaction_not_found":
+		return scenarioGetTransactionNotFound(baseURL)
 	default:
 		return ScenarioResult{}, fmt.Errorf("unknown scenario: %s", scenario)
 	}
@@ -422,6 +474,68 @@ func scenarioMissingOriginalTransactionID(baseURL string) (ScenarioResult, error
 	return r.result("missing_original_transaction_id"), nil
 }
 
+// scenarioMissingID validates that requests without id are rejected with 400.
+func scenarioMissingID(baseURL string) (ScenarioResult, error) {
+	r := newRunner(baseURL)
+	payload := purchasePayload("tx-mid-001", "idem-mid-001", "APPROVED", 1000)
+	delete(payload, "id")
+	r.post("POST PURCHASE without id → expect 400", payload, 400)
+	return r.result("missing_id"), nil
+}
+
+// scenarioMissingIdempotencyKey validates that requests without idempotency_key are rejected with 400.
+func scenarioMissingIdempotencyKey(baseURL string) (ScenarioResult, error) {
+	r := newRunner(baseURL)
+	payload := purchasePayload("tx-mik-001", "", "APPROVED", 1000)
+	r.post("POST PURCHASE with empty idempotency_key → expect 400", payload, 400)
+	return r.result("missing_idempotency_key"), nil
+}
+
+// scenarioInvalidCreatedAt validates that requests with non-RFC3339 created_at are rejected with 400.
+func scenarioInvalidCreatedAt(baseURL string) (ScenarioResult, error) {
+	r := newRunner(baseURL)
+	payload := purchasePayload("tx-ica-001", "idem-ica-001", "APPROVED", 1000)
+	payload["event"] = map[string]any{
+		"id":              "evt-tx-ica-001",
+		"created_at":      "not-a-date",
+		"idempotency_key": "idem-ica-001",
+	}
+	r.post("POST PURCHASE with invalid created_at → expect 400", payload, 400)
+	return r.result("invalid_created_at"), nil
+}
+
+// scenarioInvalidJSONBody validates that non-JSON request bodies are rejected with 400.
+func scenarioInvalidJSONBody(baseURL string) (ScenarioResult, error) {
+	r := newRunner(baseURL)
+	r.postRaw("POST non-JSON body → expect 400", []byte("this is not json"), 400)
+	return r.result("invalid_json_body"), nil
+}
+
+// ── Query flows ───────────────────────────────────────────────────────────────
+
+// scenarioListTransactions validates that GET /transactions returns a JSON array.
+func scenarioListTransactions(baseURL string) (ScenarioResult, error) {
+	r := newRunner(baseURL)
+	r.post("POST PURCHASE APPROVED (seed data)", purchasePayload("tx-lt-001", "idem-lt-001", "APPROVED", 10000), 200)
+	r.get("GET /transactions → expect 200 with array", baseURL+"/transactions", 200)
+	return r.result("list_transactions"), nil
+}
+
+// scenarioGetTransactionExisting validates that GET /transactions/:id returns 200 for an existing transaction.
+func scenarioGetTransactionExisting(baseURL string) (ScenarioResult, error) {
+	r := newRunner(baseURL)
+	r.post("POST PURCHASE APPROVED (seed data)", purchasePayload("tx-gte-001", "idem-gte-001", "APPROVED", 10000), 200)
+	r.get("GET /transactions/tx-gte-001 → expect 200", baseURL+"/transactions/tx-gte-001", 200)
+	return r.result("get_transaction_existing"), nil
+}
+
+// scenarioGetTransactionNotFound validates that GET /transactions/:id with unknown id returns 404.
+func scenarioGetTransactionNotFound(baseURL string) (ScenarioResult, error) {
+	r := newRunner(baseURL)
+	r.get("GET /transactions/non-existent-id → expect 404", baseURL+"/transactions/non-existent-tx-id", 404)
+	return r.result("get_transaction_not_found"), nil
+}
+
 // availableScenarios returns all scenario names.
 func availableScenarios() []string {
 	return []string{
@@ -453,5 +567,13 @@ func availableScenarios() []string {
 		"webhook_retry",
 		// Validation errors
 		"missing_original_transaction_id",
+		"missing_id",
+		"missing_idempotency_key",
+		"invalid_created_at",
+		"invalid_json_body",
+		// Query flows
+		"list_transactions",
+		"get_transaction_existing",
+		"get_transaction_not_found",
 	}
 }
