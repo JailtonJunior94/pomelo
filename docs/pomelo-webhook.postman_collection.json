@@ -59,8 +59,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_purchase_approved', 'tx-approved-' + Date.now());",
-                  "pm.collectionVariables.set('idem_purchase_approved', 'idem-approved-' + Date.now());"
+                  "pm.environment.set('tx_purchase_approved', 'tx-approved-' + Date.now());",
+                  "pm.environment.set('idem_purchase_approved', 'idem-approved-' + Date.now());"
                 ]
               }
             },
@@ -151,8 +151,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_purchase_rejected', 'tx-rejected-' + Date.now());",
-                  "pm.collectionVariables.set('idem_purchase_rejected', 'idem-rejected-' + Date.now());"
+                  "pm.environment.set('tx_purchase_rejected', 'tx-rejected-' + Date.now());",
+                  "pm.environment.set('idem_purchase_rejected', 'idem-rejected-' + Date.now());"
                 ]
               }
             },
@@ -206,8 +206,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rt_purchase', 'tx-rt-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rt_purchase', 'idem-rt-p-' + Date.now());"
+                  "pm.environment.set('tx_rt_purchase', 'tx-rt-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rt_purchase', 'idem-rt-p-' + Date.now());"
                 ]
               }
             },
@@ -253,8 +253,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rt_reversal', 'tx-rt-rev-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rt_reversal', 'idem-rt-r-' + Date.now());"
+                  "pm.environment.set('tx_rt_reversal', 'tx-rt-rev-' + Date.now());",
+                  "pm.environment.set('idem_rt_reversal', 'idem-rt-r-' + Date.now());"
                 ]
               }
             },
@@ -308,8 +308,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rp_purchase', 'tx-rp-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rp_purchase', 'idem-rp-p-' + Date.now());"
+                  "pm.environment.set('tx_rp_purchase', 'tx-rp-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rp_purchase', 'idem-rp-p-' + Date.now());"
                 ]
               }
             },
@@ -355,8 +355,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rp_reversal', 'tx-rp-rev-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rp_reversal', 'idem-rp-r-' + Date.now());"
+                  "pm.environment.set('tx_rp_reversal', 'tx-rp-rev-' + Date.now());",
+                  "pm.environment.set('idem_rp_reversal', 'idem-rp-r-' + Date.now());"
                 ]
               }
             },
@@ -407,8 +407,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rft_purchase', 'tx-rft-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rft_purchase', 'idem-rft-p-' + Date.now());"
+                  "pm.environment.set('tx_rft_purchase', 'tx-rft-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rft_purchase', 'idem-rft-p-' + Date.now());"
                 ]
               }
             },
@@ -454,8 +454,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rft_refund', 'tx-rft-refund-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rft_refund', 'idem-rft-r-' + Date.now());"
+                  "pm.environment.set('tx_rft_refund', 'tx-rft-refund-' + Date.now());",
+                  "pm.environment.set('idem_rft_refund', 'idem-rft-r-' + Date.now());"
                 ]
               }
             },
@@ -506,8 +506,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rfp1_purchase', 'tx-rfp1-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rfp1_purchase', 'idem-rfp1-p-' + Date.now());"
+                  "pm.environment.set('tx_rfp1_purchase', 'tx-rfp1-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rfp1_purchase', 'idem-rfp1-p-' + Date.now());"
                 ]
               }
             },
@@ -553,8 +553,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rfp1_refund', 'tx-rfp1-refund-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rfp1_refund', 'idem-rfp1-r-' + Date.now());"
+                  "pm.environment.set('tx_rfp1_refund', 'tx-rfp1-refund-' + Date.now());",
+                  "pm.environment.set('idem_rfp1_refund', 'idem-rfp1-r-' + Date.now());"
                 ]
               }
             },
@@ -605,8 +605,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rfpm_purchase', 'tx-rfpm-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rfpm_purchase', 'idem-rfpm-p-' + Date.now());"
+                  "pm.environment.set('tx_rfpm_purchase', 'tx-rfpm-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rfpm_purchase', 'idem-rfpm-p-' + Date.now());"
                 ]
               }
             },
@@ -652,8 +652,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rfpm_refund1', 'tx-rfpm-r1-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rfpm_refund1', 'idem-rfpm-r1-' + Date.now());"
+                  "pm.environment.set('tx_rfpm_refund1', 'tx-rfpm-r1-' + Date.now());",
+                  "pm.environment.set('idem_rfpm_refund1', 'idem-rfpm-r1-' + Date.now());"
                 ]
               }
             },
@@ -699,8 +699,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rfpm_refund2', 'tx-rfpm-r2-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rfpm_refund2', 'idem-rfpm-r2-' + Date.now());"
+                  "pm.environment.set('tx_rfpm_refund2', 'tx-rfpm-r2-' + Date.now());",
+                  "pm.environment.set('idem_rfpm_refund2', 'idem-rfpm-r2-' + Date.now());"
                 ]
               }
             },
@@ -751,8 +751,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rfex_purchase', 'tx-rfex-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rfex_purchase', 'idem-rfex-p-' + Date.now());"
+                  "pm.environment.set('tx_rfex_purchase', 'tx-rfex-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rfex_purchase', 'idem-rfex-p-' + Date.now());"
                 ]
               }
             },
@@ -798,8 +798,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rfex_refund', 'tx-rfex-refund-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rfex_refund', 'idem-rfex-r-' + Date.now());"
+                  "pm.environment.set('tx_rfex_refund', 'tx-rfex-refund-' + Date.now());",
+                  "pm.environment.set('idem_rfex_refund', 'idem-rfex-r-' + Date.now());"
                 ]
               }
             },
@@ -853,8 +853,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rapf_purchase', 'tx-rapf-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rapf_purchase', 'idem-rapf-p-' + Date.now());"
+                  "pm.environment.set('tx_rapf_purchase', 'tx-rapf-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rapf_purchase', 'idem-rapf-p-' + Date.now());"
                 ]
               }
             },
@@ -900,8 +900,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rapf_refund', 'tx-rapf-refund-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rapf_refund', 'idem-rapf-r-' + Date.now());"
+                  "pm.environment.set('tx_rapf_refund', 'tx-rapf-refund-' + Date.now());",
+                  "pm.environment.set('idem_rapf_refund', 'idem-rapf-r-' + Date.now());"
                 ]
               }
             },
@@ -947,8 +947,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rapf_reversal', 'tx-rapf-rev-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rapf_reversal', 'idem-rapf-rv-' + Date.now());"
+                  "pm.environment.set('tx_rapf_reversal', 'tx-rapf-rev-' + Date.now());",
+                  "pm.environment.set('idem_rapf_reversal', 'idem-rapf-rv-' + Date.now());"
                 ]
               }
             },
@@ -1002,8 +1002,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_idem', 'tx-idem-' + Date.now());",
-                  "pm.collectionVariables.set('idem_idem', 'idem-fixed-key-12345');"
+                  "pm.environment.set('tx_idem', 'tx-idem-' + Date.now());",
+                  "pm.environment.set('idem_idem', 'idem-idem-' + Date.now());"
                 ]
               }
             },
@@ -1102,11 +1102,11 @@
                 "type": "text/javascript",
                 "exec": [
                   "const ts = Date.now();",
-                  "pm.collectionVariables.set('tx_ooo_purchase', 'tx-ooo-purchase-' + ts);",
-                  "pm.collectionVariables.set('tx_ooo_refund', 'tx-ooo-refund-' + ts);",
-                  "pm.collectionVariables.set('idem_ooo_purchase', 'idem-ooo-p-' + ts);",
-                  "pm.collectionVariables.set('idem_ooo_refund1', 'idem-ooo-r1-' + ts);",
-                  "pm.collectionVariables.set('idem_ooo_refund2', 'idem-ooo-r2-' + ts);"
+                  "pm.environment.set('tx_ooo_purchase', 'tx-ooo-purchase-' + ts);",
+                  "pm.environment.set('tx_ooo_refund', 'tx-ooo-refund-' + ts);",
+                  "pm.environment.set('idem_ooo_purchase', 'idem-ooo-p-' + ts);",
+                  "pm.environment.set('idem_ooo_refund1', 'idem-ooo-r1-' + ts);",
+                  "pm.environment.set('idem_ooo_refund2', 'idem-ooo-r2-' + ts);"
                 ]
               }
             },
@@ -1234,8 +1234,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_retry', 'tx-retry-' + Date.now());",
-                  "pm.collectionVariables.set('idem_retry_1', 'idem-retry-delivery1-' + Date.now());"
+                  "pm.environment.set('tx_retry', 'tx-retry-' + Date.now());",
+                  "pm.environment.set('idem_retry_1', 'idem-retry-delivery1-' + Date.now());"
                 ]
               }
             },
@@ -1326,8 +1326,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_adj_rej', 'tx-adj-rej-' + Date.now());",
-                  "pm.collectionVariables.set('idem_adj_rej_p', 'idem-adj-rej-p-' + Date.now());"
+                  "pm.environment.set('tx_adj_rej', 'tx-adj-rej-' + Date.now());",
+                  "pm.environment.set('idem_adj_rej_p', 'idem-adj-rej-p-' + Date.now());"
                 ]
               }
             },
@@ -1373,8 +1373,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_adj_rej_r', 'tx-adj-rej-r-' + Date.now());",
-                  "pm.collectionVariables.set('idem_adj_rej_r', 'idem-adj-rej-r-' + Date.now());"
+                  "pm.environment.set('tx_adj_rej_r', 'tx-adj-rej-r-' + Date.now());",
+                  "pm.environment.set('idem_adj_rej_r', 'idem-adj-rej-r-' + Date.now());"
                 ]
               }
             },
@@ -1576,7 +1576,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('idem_nooriginal', 'idem-nooriginal-' + Date.now());"
+                  "pm.environment.set('idem_nooriginal', 'idem-nooriginal-' + Date.now());"
                 ]
               }
             },
@@ -1630,8 +1630,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_vmin', 'tx-vmin-' + Date.now());",
-                  "pm.collectionVariables.set('idem_vmin', 'idem-vmin-' + Date.now());"
+                  "pm.environment.set('tx_vmin', 'tx-vmin-' + Date.now());",
+                  "pm.environment.set('idem_vmin', 'idem-vmin-' + Date.now());"
                 ]
               }
             },
@@ -1680,8 +1680,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_vmax', 'tx-vmax-' + Date.now());",
-                  "pm.collectionVariables.set('idem_vmax', 'idem-vmax-' + Date.now());"
+                  "pm.environment.set('tx_vmax', 'tx-vmax-' + Date.now());",
+                  "pm.environment.set('idem_vmax', 'idem-vmax-' + Date.now());"
                 ]
               }
             },
@@ -1730,7 +1730,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('idem_vlow', 'idem-vlow-' + Date.now());"
+                  "pm.environment.set('idem_vlow', 'idem-vlow-' + Date.now());"
                 ]
               }
             },
@@ -1779,7 +1779,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('idem_vhigh', 'idem-vhigh-' + Date.now());"
+                  "pm.environment.set('idem_vhigh', 'idem-vhigh-' + Date.now());"
                 ]
               }
             },
@@ -1828,7 +1828,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('idem_vneg', 'idem-vneg-' + Date.now());"
+                  "pm.environment.set('idem_vneg', 'idem-vneg-' + Date.now());"
                 ]
               }
             },
@@ -1882,8 +1882,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rex_purchase', 'tx-rex-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rex_purchase', 'idem-rex-p-' + Date.now());"
+                  "pm.environment.set('tx_rex_purchase', 'tx-rex-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rex_purchase', 'idem-rex-p-' + Date.now());"
                 ]
               }
             },
@@ -1929,8 +1929,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rex_reversal', 'tx-rex-rev-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rex_reversal', 'idem-rex-r-' + Date.now());"
+                  "pm.environment.set('tx_rex_reversal', 'tx-rex-rev-' + Date.now());",
+                  "pm.environment.set('idem_rex_reversal', 'idem-rex-r-' + Date.now());"
                 ]
               }
             },
@@ -1984,8 +1984,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rvrj_purchase', 'tx-rvrj-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rvrj_purchase', 'idem-rvrj-p-' + Date.now());"
+                  "pm.environment.set('tx_rvrj_purchase', 'tx-rvrj-purchase-' + Date.now());",
+                  "pm.environment.set('idem_rvrj_purchase', 'idem-rvrj-p-' + Date.now());"
                 ]
               }
             },
@@ -2031,8 +2031,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_rvrj_reversal', 'tx-rvrj-rev-' + Date.now());",
-                  "pm.collectionVariables.set('idem_rvrj_reversal', 'idem-rvrj-r-' + Date.now());"
+                  "pm.environment.set('tx_rvrj_reversal', 'tx-rvrj-rev-' + Date.now());",
+                  "pm.environment.set('idem_rvrj_reversal', 'idem-rvrj-r-' + Date.now());"
                 ]
               }
             },
@@ -2086,8 +2086,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_mae_purchase', 'tx-mae-purchase-' + Date.now());",
-                  "pm.collectionVariables.set('idem_mae_purchase', 'idem-mae-p-' + Date.now());"
+                  "pm.environment.set('tx_mae_purchase', 'tx-mae-purchase-' + Date.now());",
+                  "pm.environment.set('idem_mae_purchase', 'idem-mae-p-' + Date.now());"
                 ]
               }
             },
@@ -2133,8 +2133,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_mae_refund1', 'tx-mae-r1-' + Date.now());",
-                  "pm.collectionVariables.set('idem_mae_refund1', 'idem-mae-r1-' + Date.now());"
+                  "pm.environment.set('tx_mae_refund1', 'tx-mae-r1-' + Date.now());",
+                  "pm.environment.set('idem_mae_refund1', 'idem-mae-r1-' + Date.now());"
                 ]
               }
             },
@@ -2180,8 +2180,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('tx_mae_refund2', 'tx-mae-r2-' + Date.now());",
-                  "pm.collectionVariables.set('idem_mae_refund2', 'idem-mae-r2-' + Date.now());"
+                  "pm.environment.set('tx_mae_refund2', 'tx-mae-r2-' + Date.now());",
+                  "pm.environment.set('idem_mae_refund2', 'idem-mae-r2-' + Date.now());"
                 ]
               }
             },
